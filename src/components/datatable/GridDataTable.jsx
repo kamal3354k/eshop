@@ -18,10 +18,12 @@ import {
 } from "../../redux/services/product";
 import CreateAndUpdateForm from "../form/CreateAndUpdateForm";
 import _ from "lodash";
-import { searchQueryObj } from "../../constant";
+import { categoryArray, searchQueryObj } from "../../constant";
 import debounce from "lodash/debounce";
 import { Paginator } from "primereact/paginator";
 import { Sidebar } from "primereact/sidebar";
+import { Slider } from "primereact/slider";
+import { MultiSelect } from "primereact/multiselect";
 
 export default function GridDataTable() {
   let emptyProduct = {
@@ -33,13 +35,6 @@ export default function GridDataTable() {
     quantity: 0,
     rating: 0,
     inventoryStatus: "INSTOCK",
-  };
-
-  const emptyPagination = {
-    totolData: null,
-    currentPage: null,
-    offset: 0,
-    limit: 10,
   };
 
   const [productDialog, setProductDialog] = useState({
@@ -57,10 +52,9 @@ export default function GridDataTable() {
   const dt = useRef(null);
   const [deleteProduct] = useDeleteProductMutation();
   const [searchAndFilter, { isLoading }] = useSearchAndFilterMutation();
-  const [visibleLeft, setVisibleLeft] = useState(false);
   const [visibleRight, setVisibleRight] = useState(false);
-  const [visibleTop, setVisibleTop] = useState(false);
-  const [visibleBottom, setVisibleBottom] = useState(false);
+  const [selectedCities, setSelectedCities] = useState(null);
+  const [range, setRange] = useState([0, 10000]);
 
   const formatCurrency = (value) => {
     return value
@@ -114,7 +108,8 @@ export default function GridDataTable() {
   };
 
   const callSearchMutationFunction = (value) => {
-    searchAndFilter(value)
+    const searchQueryString = new URLSearchParams(value).toString();
+    searchAndFilter(searchQueryString)
       .then((d) => {
         setProducts(d?.data);
       })
@@ -123,11 +118,7 @@ export default function GridDataTable() {
 
   const debouncedSearch = useCallback(
     debounce((value) => {
-      const searchQueryString = new URLSearchParams(value).toString();
-
-      if (searchQueryString) {
-        callSearchMutationFunction(searchQueryString);
-      }
+      callSearchMutationFunction(value);
     }, 500),
     []
   );
@@ -256,6 +247,15 @@ export default function GridDataTable() {
     setPaginationObj({ first, rows });
   };
 
+  const handleFilterSelect = ({ target: { value } }) => {
+    console.log(value);
+    setSelectedCities(value);
+    setSearchQuery((pre) => ({ ...pre, category: value.join() }));
+  };
+
+  useEffect(() => {
+    callSearchMutationFunction(searchQuery);
+  }, [searchQuery]);
   const header = (
     <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
       <h4 className="m-0">Manage Products</h4>
@@ -308,24 +308,40 @@ export default function GridDataTable() {
     </React.Fragment>
   );
 
+  const handleRange = useCallback((e) => {
+    setRange(e.value);
+  }, []);
+
   return (
     <div>
       <div className="card">
         <div className="flex gap-2 justify-content-center"></div>
 
-
         <Sidebar
           visible={visibleRight}
           position="right"
           onHide={() => setVisibleRight(false)}
+          style={{ width: "23rem" }}
         >
-          <h2>Right Sidebar</h2>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
-          </p>
+          <h3>Filter</h3>
+          <div className="flex range-input-container">
+            <div className="item">
+              <div className="label-container">
+                <label>Min:{range[0]}</label>
+                <label>Max:{range[1]}</label>
+              </div>
+              <Slider min={0} max={10000} value={range} onChange={handleRange} range />
+            </div>
+          </div>
+          {/* <MultiSelect
+            id="select"
+            value={selectedCities}
+            onChange={handleFilterSelect}
+            options={categoryArray}
+            optionLabel="name"
+            maxSelectedLabels={3}
+            className="w-full md:w-20rem"
+          /> */}
         </Sidebar>
       </div>
       <div className="gridDatatable">

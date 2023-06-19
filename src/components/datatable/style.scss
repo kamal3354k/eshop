@@ -12,6 +12,22 @@
 .product-image {
   max-width: 100%;
 }
+.range-input-container {
+  gap: 10px;
+  .item {
+    width: 100%;
+    .label-container{
+      display: flex;
+      justify-content: space-between;
+      label{
+      font-size: 16px;
+      margin-bottom: 5px;
+    }}
+    .p-slider{
+      margin-top: 10px;
+    }
+  }
+}
 .image-container {
   display: flex;
   justify-content: center;

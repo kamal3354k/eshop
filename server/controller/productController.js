@@ -4,6 +4,8 @@ import { searchAndFilterSchema } from "../schemas/product.js";
 import ProductValidationFunction from "./validation/productValidation.js";
 import _ from "lodash";
 
+const selectedCategories = ['home'];
+
 // Post API controller
 export const createProduct = async (req, res, next) => {
   try {
@@ -61,8 +63,8 @@ export const updateProduct = async (req, res, next) => {
   try {
     const { id } = req?.params;
     const value = JSON.parse(JSON.stringify(req.body));
-    
-    if (Object.keys(req.body).length||req.file) {
+
+    if (Object.keys(req.body).length || req.file) {
       const image = (await req?.file)
         ? req.file.buffer.toString("base64")
         : null;
@@ -129,10 +131,13 @@ export const searchAndFilter = async (req, res, next) => {
       : {
           ...defaultQuery,
           $and: Object.entries(filterableFields).map(([k, v]) => {
+            console.log(k,v)
             if (k === "min_price") {
               return { price: { $gte: v } };
             } else if (k === "max_price") {
               return { price: { $lte: v } };
+            // } else if (k === "category") {
+            //   return { category:  ["books"]  };
             } else {
               return { [k]: { $regex: v, $options: "i" } };
             }
@@ -145,7 +150,8 @@ export const searchAndFilter = async (req, res, next) => {
       .find(query)
       .select(payload?.select ? payload?.select.split(",") : false)
       .skip(offset)
-      .limit(limit);
+      .limit(limit)
+     
     // searchedData
 
     searchedData?.map((item) => {

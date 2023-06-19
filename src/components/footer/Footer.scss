@@ -5,7 +5,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 8rem;
+    height: 4rem;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
     p {
       color: #fff;
     }

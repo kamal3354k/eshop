@@ -1,0 +1,26 @@
+.product-form {
+  .image-error {
+    border-color: #e24c4c;
+    .no-image {
+      opacity: 0.8;
+      color: #e24c4c;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      span {
+        font-size: 12px;
+      }
+    }
+  }
+  .field{
+    label{
+      text-transform: capitalize;
+    }
+  }
+  .dialog-footer {
+    display: flex;
+    gap: 10px;
+    margin: 5px 0 0 0;
+  }
+}

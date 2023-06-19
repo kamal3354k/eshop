@@ -19,17 +19,17 @@ const logo = (
   </div>
 );
 
-const cart = (
-  <span className="cart">
-    <NavLink
-      className={({ isActive }) => (isActive ? "active" : "")}
-      to="/cart"
-    >
-      Cart <FaShoppingCart size={20} />
-      <p>0</p>
-    </NavLink>
-  </span>
-);
+// const cart = (
+//   <span className="cart">
+//     <NavLink
+//       className={({ isActive }) => (isActive ? "active" : "")}
+//       to="/cart"
+//     >
+//       Cart <FaShoppingCart size={20} />
+//       <p>0</p>
+//     </NavLink>
+//   </span>
+// );
 
 const Header = () => {
   const user = useSelector((state) => state.auth);
@@ -79,22 +79,22 @@ const Header = () => {
                 <Link to="/">{logo}</Link>
               </li>
             )}
-            <li>
+            {/* <li>
               <NavLink
                 className={({ isActive }) => (isActive ? "active" : "")}
                 to="/"
               >
                 Home
               </NavLink>
-            </li>
-            <li>
+            </li> */}
+            {/* <li>
               <NavLink
                 className={({ isActive }) => (isActive ? "active" : "")}
                 to="/contact"
               >
                 Contact Us
               </NavLink>
-            </li>
+            </li> */}
           </ul>
           <div onClick={handleHideMenu} className="header-right">
             <span className="links">
@@ -124,19 +124,18 @@ const Header = () => {
                   Register
                 </NavLink>
               )}
-              <NavLink
+              {/* <NavLink
                 className={({ isActive }) => (isActive ? "active" : "")}
                 to="/order-history"
               >
                 My orders
-              </NavLink>
+              </NavLink> */}
             </span>
-            {cart}
+            {/* {cart} */}
           </div>
         </nav>
 
         <div className="menu-icon">
-          {cart}
           <HiOutlineMenuAlt3 size={28} onClick={toggleShowMenu} />
         </div>
       </div>

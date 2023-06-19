@@ -169,7 +169,9 @@ header {
         }
 
         .links {
-          display: block;
+          span {
+            display: block;
+          }
           a {
             display: block;
             margin: 0;
@@ -231,6 +233,6 @@ header {
   font-size: 13px;
 }
 
-.cursor-pointer{
+.cursor-pointer {
   cursor: pointer;
 }

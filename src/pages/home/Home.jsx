@@ -1,10 +1,10 @@
-import React from "react";
-import Slider from "../../components/slider/Slider";
+import React, { useEffect } from "react";
+import GridDataTable from "../../components/datatable/GridDataTable";
 
 const Home = () => {
   return (
     <>
-      <Slider />
+      <GridDataTable />
     </>
   );
 };

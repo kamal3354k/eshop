@@ -1,0 +1,67 @@
+.gridDatatable {
+  .card {
+    padding: 20px;
+  }
+  padding-bottom: 4rem;
+}
+
+.search-container {
+  display: flex;
+  gap: 5px;
+}
+.product-image {
+  max-width: 100%;
+}
+.image-container {
+  display: flex;
+  justify-content: center;
+
+  .edit-container {
+    position: absolute;
+    right: 12px;
+    z-index: 1;
+    top: 0px;
+    input {
+      display: none;
+      + label {
+        display: inline-block;
+        width: 34px;
+        height: 34px;
+        margin-bottom: 0;
+        font-size: 16px;
+        border-radius: 100%;
+        background: #ffffff;
+        border: 1px solid transparent;
+        box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+        cursor: pointer;
+        font-weight: normal;
+        transition: all 0.2s ease-in-out;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        &:hover {
+          background: #f1f1f1;
+          border-color: #d6d6d6;
+        }
+      }
+    }
+  }
+  .image-preview {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 6px solid #f8f8f8;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    .no-image {
+      font-size: 40px;
+      opacity: 0.3;
+    }
+  }
+}

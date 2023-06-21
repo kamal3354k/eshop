@@ -35,7 +35,7 @@ const CreateAndUpdateForm = ({
   } = useForm();
 
   const handleImage = async (event) => {
-    const file = event.target.files[0];
+    const file = await event.target.files[0];
     setImage({ file: file, previewImage: URL.createObjectURL(file) });
     return event;
   };
@@ -46,10 +46,11 @@ const CreateAndUpdateForm = ({
       image: image?.file,
     };
 
+    console.log(fieldData, "fieldData");
+
     if (productDialog?.lastClick === "NEW") {
       addProduct(sentData).then((d) => {
-        if (d.error) {
-        } else {
+        if (!d.error) {
           setProductDialog(false);
           callSearchMutationFunction();
         }
@@ -62,7 +63,7 @@ const CreateAndUpdateForm = ({
         }
       }
 
-      updateProduct({...ChangedValueObject,id: product?._id,  }).then((d) => {
+      updateProduct({ ...ChangedValueObject, id: product?._id }).then((d) => {
         if (d.error) {
         } else {
           setProductDialog(false);
@@ -74,14 +75,6 @@ const CreateAndUpdateForm = ({
 
   useEffect(() => {
     if (product?._id && productDialog?.lastClick === "EDIT") {
-      //   console.log(
-      //     base64toFile(
-      //       image?.previewImage?.split("base64,")[1],
-      //       `file.${image?.previewImage?.split("image/")[1].split(";base64")[0]}`,
-      //       image?.previewImage?.split("data:")[1].split(";base64")[0]
-      //     ),
-      //     "file"
-      //   );
       setImage({ previewImage: product?.image });
       reset({ ...product, image: image?.file });
     } else {
@@ -93,14 +86,12 @@ const CreateAndUpdateForm = ({
   return (
     <Dialog
       visible={productDialog?.value}
-      style={{ width: "32rem" }}
       breakpoints={{ "960px": "75vw", "641px": "90vw" }}
       header={`${
         productDialog?.lastClick === "Edit" ? "Edit" : "Add"
       } Product Details`}
       modal
-      className="p-fluid"
-      // footer={productDialogFooter({ hideDialog, saveProduct })}
+      className="p-fluid dialog"
       onHide={hideDialog}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="product-form">
@@ -153,7 +144,11 @@ const CreateAndUpdateForm = ({
               },
             }}
             render={({ field }) => (
-              <InputText {...field} className={errors?.name && "p-invalid"} />
+              <InputText
+                {...field}
+                placeholder="Enter Product Name..."
+                className={errors?.name && "p-invalid"}
+              />
             )}
           />
           {errors?.name && (
@@ -185,6 +180,7 @@ const CreateAndUpdateForm = ({
                 id="description"
                 rows={3}
                 cols={20}
+                placeholder="Enter Product Description..."
                 {...field}
                 className={errors?.description && "p-invalid"}
               />
@@ -252,6 +248,7 @@ const CreateAndUpdateForm = ({
                     value={field.value}
                     mode="currency"
                     currency="INR"
+                    placeholder="Enter Product Price..."
                     locale="en-IN"
                     onValueChange={(e) => field.onChange(e.value)}
                     className={fieldState.invalid ? "p-invalid" : ""}
@@ -289,6 +286,7 @@ const CreateAndUpdateForm = ({
                   <InputNumber
                     id="quantity"
                     value={field.value}
+                    placeholder="Enter Product Quantity..."
                     onValueChange={(e) => field.onChange(e.value)}
                     className={fieldState.invalid ? "p-invalid" : ""}
                   />

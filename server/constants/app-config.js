@@ -1,3 +1,3 @@
 export const APP_CONFIG = {
-  nonFilterableFields: ["search", "limit", "offset", "page", "select","category"],
+  nonFilterableFields: ["search", "limit", "offset", "page", "select"],
 };

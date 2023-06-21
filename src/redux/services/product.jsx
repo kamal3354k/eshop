@@ -1,13 +1,13 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import axios from "axios";
 import { toast } from "react-toastify";
-
-const baseUrl = "http://localhost:5000";
+import { APP_CONFIG } from "../../app.config";
+import { FormDataGeneratorFun } from "../../utlis";
 
 export const productAPI = createApi({
   reducerPath: "productApi",
   baseQuery: fetchBaseQuery({
-    baseUrl,
+    baseUrl: APP_CONFIG.APP_URL,
     prepareHeaders: (headers) => {
       headers.set("Content-Type", "multipart/form-data");
       return headers;
@@ -27,19 +27,11 @@ export const productAPI = createApi({
     }),
     addProduct: builder.mutation({
       async queryFn(product) {
-        // todo: loop function
         if (product) {
-          const formData = new FormData();
-          formData.append("name", product.name);
-          formData.append("category", product.category);
-          formData.append("quantity", product.quantity);
-          formData.append("description", product.description);
-          formData.append("price", product.price);
-
-          formData.append("image", product.image, product.image.name);
+          const formData = FormDataGeneratorFun(product);
 
           const response = await axios
-            .post(`${baseUrl}/product/create`, formData, {
+            .post(`${APP_CONFIG.APP_URL}/product/create`, formData, {
               headers: {
                 "Content-Type": "multipart/form-data",
               },
@@ -56,24 +48,10 @@ export const productAPI = createApi({
     }),
     updateProduct: builder.mutation({
       async queryFn(changeObj) {
-        console.log(changeObj, "----------sad");
-
-
         if (changeObj) {
-          const formData = new FormData();
-
-          for (let i in changeObj) {
-            if (changeObj[i] && i !== "id") {
-              if (changeObj[i] && i === "image") {
-                formData.append(i, changeObj[i], changeObj[i].name);
-              } else {
-                formData.append(i, changeObj[i]);
-              }
-            }
-          }
-
+          const formData = FormDataGeneratorFun(changeObj);
           const response = await axios
-            .put(`${baseUrl}/product/${changeObj?.id}`, formData,{
+            .put(`${APP_CONFIG.APP_URL}/product/${changeObj?.id}`, formData, {
               headers: {
                 "Content-Type": "multipart/form-data",
               },

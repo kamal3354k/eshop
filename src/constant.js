@@ -14,7 +14,7 @@ export const categoryArray = [
   { name: "Clothing", value: "clothing" },
   { name: "Home", value: "home" },
   { name: "Books", value: "books" },
-  { name: "Books", value: "beauty" },
+  { name: "Beauty", value: "beauty" },
   { name: "Mobile", value: "mobile" },
   { name: "Accessories", value: "accessories" },
   { name: "Fitness", value: "fitness" },
@@ -22,10 +22,21 @@ export const categoryArray = [
 
 export const searchQueryObj = {
   search: "",
-  offset: "",
-  limit: "",
-  min_price: "",
-  max_price: "",
+  offset: 0,
+  limit: 10,
+  min_price: 0,
+  max_price: 10000,
   select: "",
-  category:""
+  category: [],
+};
+
+export const emptyProduct = {
+  name: "",
+  image: null,
+  description: "",
+  category: null,
+  price: 0,
+  quantity: 0,
+  rating: 0,
+  inventoryStatus: "INSTOCK",
 };

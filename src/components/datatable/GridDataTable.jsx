@@ -18,52 +18,36 @@ import {
 } from "../../redux/services/product";
 import CreateAndUpdateForm from "../form/CreateAndUpdateForm";
 import _ from "lodash";
-import { categoryArray, searchQueryObj } from "../../constant";
+import { categoryArray, emptyProduct, searchQueryObj } from "../../constant";
 import debounce from "lodash/debounce";
 import { Paginator } from "primereact/paginator";
 import { Sidebar } from "primereact/sidebar";
 import { Slider } from "primereact/slider";
 import { MultiSelect } from "primereact/multiselect";
+import Loader from "../loader/Loader";
+import { formatCurrency } from "../../utlis";
 
 export default function GridDataTable() {
-  let emptyProduct = {
-    name: "",
-    image: null,
-    description: "",
-    category: null,
-    price: 0,
-    quantity: 0,
-    rating: 0,
-    inventoryStatus: "INSTOCK",
-  };
 
   const [productDialog, setProductDialog] = useState({
     lastClick: "",
     value: false,
   });
+
+
   const [deleteProductDialog, setDeleteProductDialog] = useState(false);
-  const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
-  const [paginationObj, setPaginationObj] = useState({ first: 0, rows: 10 });
   const [searchQuery, setSearchQuery] = useState({ ...searchQueryObj });
   const [product, setProduct] = useState(emptyProduct);
   const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState(null);
-  const [globalFilter, setGlobalFilter] = useState(null);
   const dt = useRef(null);
-  const [deleteProduct] = useDeleteProductMutation();
-  const [searchAndFilter, { isLoading }] = useSearchAndFilterMutation();
   const [visibleRight, setVisibleRight] = useState(false);
-  const [selectedCities, setSelectedCities] = useState(null);
   const [range, setRange] = useState([0, 10000]);
 
-  const formatCurrency = (value) => {
-    return value
-      ? value.toLocaleString("en-US", {
-          style: "currency",
-          currency: "INR",
-        })
-      : value;
-  };
+  // RTK hooks
+  const [deleteProduct] = useDeleteProductMutation();
+  const [searchAndFilter, { isLoading }] = useSearchAndFilterMutation();
+
 
   const openNew = () => {
     setProductDialog({ lastClick: "NEW", value: true });
@@ -76,11 +60,6 @@ export default function GridDataTable() {
 
   const hideDeleteProductDialog = () => {
     setDeleteProductDialog(false);
-  };
-
-  const hideDeleteProductsDialog = () => {
-    // setDeleteProductsDialog(false);
-    // setProduct({});
   };
 
   const editProduct = (product) => {
@@ -103,19 +82,16 @@ export default function GridDataTable() {
     setDeleteProductDialog(false);
   };
 
-  const exportCSV = () => {
-    dt.current.exportCSV();
-  };
-
-  const callSearchMutationFunction = (value) => {
+  const callSearchMutationFunction = useCallback((value) => {
     const searchQueryString = new URLSearchParams(value).toString();
     searchAndFilter(searchQueryString)
       .then((d) => {
         setProducts(d?.data);
       })
       .catch((err) => toast.error(err.response.message));
-  };
+  }, []);
 
+  //debounce
   const debouncedSearch = useCallback(
     debounce((value) => {
       callSearchMutationFunction(value);
@@ -123,19 +99,22 @@ export default function GridDataTable() {
     []
   );
 
-  // const confirmDeleteSelected = () => {
-  //   setDeleteProductsDialog(true);
-  // };
+  const handleSearch = useCallback(
+    ({ target: { value } }) => {
+      setSearchQuery((pre) => ({ ...pre, search: value || "" }));
+      debouncedSearch({ ...searchQuery, search: value });
+    },
+    [searchQuery]
+  );
 
-  // const deleteSelectedProducts = () => {};
-
-  const handleSearch = useCallback(({ target: { value } }) => {
-    setSearchQuery((pre) => ({ ...pre, search: value || "" }));
-  }, []);
-
-  useEffect(() => {
-    debouncedSearch(searchQuery);
-  }, [searchQuery?.search]);
+  const handleApplyFilter = () => {
+    callSearchMutationFunction(searchQuery);
+  };
+  const handleCancelFilter = () => {
+    setSearchQuery(searchQueryObj);
+    setRange([0,10000])
+    callSearchMutationFunction(searchQueryObj);
+  };
 
   const leftToolbarTemplate = () => {
     return (
@@ -146,46 +125,25 @@ export default function GridDataTable() {
           severity="success"
           onClick={openNew}
         />
-        {/* <Button
-          label="Delete"
-          icon="pi pi-trash"
-          severity="danger"
-          onClick={confirmDeleteSelected}
-          disabled={!selectedProducts || !selectedProducts.length}
-        /> */}
       </div>
-    );
-  };
-
-  const rightToolbarTemplate = () => {
-    return (
-      <Button
-        label="Export"
-        icon="pi pi-upload"
-        className="p-button-help"
-        onClick={exportCSV}
-      />
     );
   };
 
   const imageBodyTemplate = (rowData) => {
     return (
-      <img
-        src={rowData?.image}
-        alt={rowData.image}
-        className="shadow-2 border-round"
-        style={{ width: "64px" }}
-      />
+      <div className="datatable-image-container">
+        <img
+          src={rowData?.image}
+          alt={rowData.image}
+          className="shadow-2 border-round "
+        />
+      </div>
     );
   };
 
   const priceBodyTemplate = (rowData) => {
     return formatCurrency(rowData.price);
   };
-
-  // const ratingBodyTemplate = (rowData) => {
-  //   return <Rating value={rowData.rating} readOnly cancel={false} />;
-  // };
 
   const statusBodyTemplate = (rowData) => {
     return (
@@ -238,29 +196,24 @@ export default function GridDataTable() {
 
   //limit = row
   const onPage = ({ rows, first }) => {
-    const query = {
-      limit: rows,
-      offset: first,
-    };
-    const searchQueryString = new URLSearchParams(query).toString();
-    callSearchMutationFunction(searchQueryString);
-    setPaginationObj({ first, rows });
+    setSearchQuery((pre) => ({ ...pre, limit: rows, offset: first }));
+    callSearchMutationFunction({ ...searchQuery, limit: rows, offset: first });
   };
 
   const handleFilterSelect = ({ target: { value } }) => {
-    console.log(value);
-    setSelectedCities(value);
-    setSearchQuery((pre) => ({ ...pre, category: value.join() }));
+    setSearchQuery((pre) => ({ ...pre, category: value }));
   };
 
   useEffect(() => {
     callSearchMutationFunction(searchQuery);
-  }, [searchQuery]);
+  }, []);
+
   const header = (
     <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
       <h4 className="m-0">Manage Products</h4>
     </div>
   );
+
 
   const searchBar = (
     <span className="p-input-icon-left search-container">
@@ -291,25 +244,14 @@ export default function GridDataTable() {
       />
     </React.Fragment>
   );
-  const deleteProductsDialogFooter = (
-    <React.Fragment>
-      <Button
-        label="No"
-        icon="pi pi-times"
-        outlined
-        onClick={hideDeleteProductsDialog}
-      />
-      <Button
-        label="Yes"
-        icon="pi pi-check"
-        severity="danger"
-        // onClick={deleteSelectedProducts}
-      />
-    </React.Fragment>
-  );
 
   const handleRange = useCallback((e) => {
     setRange(e.value);
+    setSearchQuery((pre) => ({
+      ...pre,
+      min_price: e.value[0],
+      max_price: e.value[1],
+    }));
   }, []);
 
   return (
@@ -321,27 +263,48 @@ export default function GridDataTable() {
           visible={visibleRight}
           position="right"
           onHide={() => setVisibleRight(false)}
-          style={{ width: "23rem" }}
+          className="sidebar"
         >
-          <h3>Filter</h3>
-          <div className="flex range-input-container">
-            <div className="item">
-              <div className="label-container">
-                <label>Min:{range[0]}</label>
-                <label>Max:{range[1]}</label>
+          <div className="item">
+            <h3>Filter</h3>
+            <div className="flex range-input-container">
+              <div className="item">
+                <p>Price</p>
+                <hr />
+                <div className="label-container">
+                  <label>Min:{range[0]}</label>
+                  <label>Max:{range[1]}</label>
+                </div>
+                <Slider
+                  min={0}
+                  max={10000}
+                  value={range}
+                  onChange={handleRange}
+                  range
+                />
               </div>
-              <Slider min={0} max={10000} value={range} onChange={handleRange} range />
             </div>
           </div>
-          {/* <MultiSelect
-            id="select"
-            value={selectedCities}
-            onChange={handleFilterSelect}
-            options={categoryArray}
-            optionLabel="name"
-            maxSelectedLabels={3}
-            className="w-full md:w-20rem"
-          /> */}
+
+          <div className="item">
+            <p>Category</p>
+            <MultiSelect
+              id="select"
+              value={searchQuery?.category}
+              onChange={handleFilterSelect}
+              options={categoryArray}
+              optionLabel="name"
+              maxSelectedLabels={3}
+              className="w-full md:w-20rem"
+            />
+          </div>
+
+          <div className="flex justify-content-center apply-filter">
+            <Button onClick={handleApplyFilter}>Apply</Button>
+            <Button onClick={handleCancelFilter} severity="danger">
+              Cancel
+            </Button>
+          </div>
         </Sidebar>
       </div>
       <div className="gridDatatable">
@@ -360,76 +323,66 @@ export default function GridDataTable() {
                 onSelectionChange={(e) => setSelectedProducts(e.value)}
                 dataKey="_id"
                 paginator={false}
-                rows={10}
-                globalFilter={globalFilter}
                 header={header}
               >
-                {/* datatable checkbox */}
-                {/* <Column selectionMode="multiple" exportable={false}></Column> */}
                 <Column
                   field="name"
                   header="Name"
                   sortable
-                  style={{ minWidth: "16rem" }}
+                  className="datatable-column"
                 ></Column>
                 <Column
                   field="image"
                   header="Image"
                   body={imageBodyTemplate}
+                  className="datatable-column"
                 ></Column>
                 <Column
                   field="price"
                   header="Price"
                   body={priceBodyTemplate}
                   sortable
-                  style={{ minWidth: "8rem" }}
+                  className="datatable-column"
                 ></Column>
                 <Column
                   field="category"
                   header="Category"
                   sortable
-                  style={{ minWidth: "10rem" }}
+                  className="datatable-column"
                 ></Column>
-                {/* <Column
-              field="rating"
-              header="Reviews"
-              body={ratingBodyTemplate}
-              sortable
-              style={{ minWidth: "12rem" }}
-            ></Column> */}
                 <Column
                   field="inventoryStatus"
                   header="Status"
                   body={statusBodyTemplate}
                   sortable
-                  style={{ minWidth: "12rem" }}
+                  className="datatable-column"
                 ></Column>
                 <Column
                   field="quantity"
                   header="Quantity"
                   body={qunatityBodyTemplate}
                   sortable
-                  style={{ minWidth: "12rem" }}
+                  className="datatable-column"
                 ></Column>
                 <Column
                   header="Actions"
                   body={actionBodyTemplate}
                   exportable={false}
-                  style={{ minWidth: "12rem" }}
+                  className="datatable-column"
                 ></Column>
               </DataTable>
 
               <Paginator
-                first={paginationObj?.first}
-                rows={paginationObj?.rows}
+                first={searchQuery?.offset}
+                rows={searchQuery?.limit}
                 totalRecords={products?.totalData} // Total number of records
                 rowsPerPageOptions={[5, 10, 20, 50]} // Options for rows per page
                 onPageChange={onPage}
               ></Paginator>
             </>
           ) : (
-            <>Loading...</>
-          )}
+            <Loader/>
+            )}
           <CreateAndUpdateForm
             productDialog={productDialog}
             setProductDialog={setProductDialog}
@@ -443,9 +396,9 @@ export default function GridDataTable() {
 
       <Dialog
         visible={deleteProductDialog}
-        style={{ width: "32rem" }}
         breakpoints={{ "960px": "75vw", "641px": "90vw" }}
         header="Confirm"
+        className="dialog"
         modal
         footer={deleteProductDialogFooter}
         onHide={hideDeleteProductDialog}
@@ -453,32 +406,11 @@ export default function GridDataTable() {
         <div className="confirmation-content">
           <i
             className="pi pi-exclamation-triangle mr-3"
-            style={{ fontSize: "2rem" }}
           />
           {product && (
             <span>
               Are you sure you want to delete <b>{product.name}</b>?
             </span>
-          )}
-        </div>
-      </Dialog>
-
-      <Dialog
-        visible={deleteProductsDialog}
-        style={{ width: "32rem" }}
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        header="Confirm"
-        modal
-        footer={deleteProductsDialogFooter}
-        onHide={hideDeleteProductsDialog}
-      >
-        <div className="confirmation-content">
-          <i
-            className="pi pi-exclamation-triangle mr-3"
-            style={{ fontSize: "2rem" }}
-          />
-          {product && (
-            <span>Are you sure you want to delete the selected products?</span>
           )}
         </div>
       </Dialog>

@@ -4,8 +4,6 @@ import { searchAndFilterSchema } from "../schemas/product.js";
 import ProductValidationFunction from "./validation/productValidation.js";
 import _ from "lodash";
 
-const selectedCategories = ['home'];
-
 // Post API controller
 export const createProduct = async (req, res, next) => {
   try {
@@ -68,9 +66,11 @@ export const updateProduct = async (req, res, next) => {
       const image = (await req?.file)
         ? req.file.buffer.toString("base64")
         : null;
-      value.image = (await image)
-        ? `data:${req?.file?.mimetype};base64,${image}`
-        : "";
+      if (image) {
+        value.image = (await image)
+          ? `data:${req?.file?.mimetype};base64,${image}`
+          : "";
+      }
       const getProductData = await product.findByIdAndUpdate(id, value);
 
       return res.status(200).json({
@@ -112,7 +112,7 @@ export const searchAndFilter = async (req, res, next) => {
 
     const filterableFields = _.pick(
       _.omit(payload, APP_CONFIG.nonFilterableFields),
-      searchAndFilterSchema.describe().keys
+      Object.keys(searchAndFilterSchema.describe().keys)
     );
 
     const defaultQuery = {
@@ -131,15 +131,17 @@ export const searchAndFilter = async (req, res, next) => {
       : {
           ...defaultQuery,
           $and: Object.entries(filterableFields).map(([k, v]) => {
-            console.log(k,v)
+            console.log(filterableFields, "filter");
             if (k === "min_price") {
               return { price: { $gte: v } };
             } else if (k === "max_price") {
               return { price: { $lte: v } };
-            // } else if (k === "category") {
-            //   return { category:  ["books"]  };
+            } else if (k === "category" && v) {
+              return { category: v.split(",") };
             } else {
-              return { [k]: { $regex: v, $options: "i" } };
+              return k !== "select"
+                ? { [k]: { $regex: v, $options: "i" } }
+                : {};
             }
           }),
         };
@@ -150,8 +152,8 @@ export const searchAndFilter = async (req, res, next) => {
       .find(query)
       .select(payload?.select ? payload?.select.split(",") : false)
       .skip(offset)
-      .limit(limit)
-     
+      .limit(limit);
+
     // searchedData
 
     searchedData?.map((item) => {
@@ -177,8 +179,6 @@ export const searchAndFilter = async (req, res, next) => {
         message: err.message,
       });
     }
-    // if(err.constructor)
-
     next(err);
   }
 };

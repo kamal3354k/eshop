@@ -50,7 +50,7 @@ const Register = () => {
   
   return (
     <>
-      {loading && <Loader />}
+      {loading && <Loader cover={true}/>}
       <section className="container auth">
         <Card>
           <div className="form">

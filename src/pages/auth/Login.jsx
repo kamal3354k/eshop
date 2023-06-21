@@ -19,7 +19,7 @@ const Login = () => {
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const user = useSelector((state)=>state?.auth)
+  const user = useSelector((state) => state?.auth);
 
   const handleForm = ({ target: { name, value } }) => {
     setForm((pre) => ({ ...pre, [name]: value }));
@@ -46,11 +46,11 @@ const Login = () => {
     });
   };
 
-  if(user?.id) return <Navigate to="/"/>
+  if (user?.id) return <Navigate to="/" />;
 
   return (
     <>
-      {loading && <Loader />}
+      {loading && <Loader cover={true} />}
       <section className="container auth">
         <div className="img">
           <img src={loginImage} alt="Login" width="400" />
@@ -81,10 +81,7 @@ const Login = () => {
               </div>
               <p>-- or --</p>
             </form>
-            <GoogleButton
-              style={{ width: "100%" }}
-              onClick={googleLoginHandle}
-            />
+            <GoogleButton className="google-btn" onClick={googleLoginHandle} />
             <span className="register">
               <p>Don't have an account?</p>
               <Link to="/register">&nbsp;Register</Link>

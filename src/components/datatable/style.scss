@@ -1,8 +1,16 @@
 .gridDatatable {
   .card {
     padding: 20px;
+    .datatable-column {
+      min-width: 120px;
+      .datatable-image-container {
+        img {
+          width: 70px;
+        }
+      }
+    }
   }
-  padding-bottom: 4rem;
+  padding-bottom: 40px;
 }
 
 .search-container {
@@ -12,20 +20,34 @@
 .product-image {
   max-width: 100%;
 }
-.range-input-container {
-  gap: 10px;
+.sidebar {
+  width: 230px;
   .item {
-    width: 100%;
-    .label-container{
-      display: flex;
-      justify-content: space-between;
-      label{
-      font-size: 16px;
-      margin-bottom: 5px;
-    }}
-    .p-slider{
-      margin-top: 10px;
+    margin: 10px 0;
+    p {
+      margin: 5px 0;
     }
+    .range-input-container {
+      gap: 10px;
+      .item {
+        width: 100%;
+        .label-container {
+          display: flex;
+          justify-content: space-between;
+          label {
+            font-size: 12px;
+            margin: 5px 0;
+          }
+        }
+        .p-slider {
+          margin-top: 10px;
+        }
+      }
+    }
+  }
+  .apply-filter {
+    margin: 15px;
+    gap: 10px;
   }
 }
 .image-container {

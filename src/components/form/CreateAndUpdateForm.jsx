@@ -45,9 +45,7 @@ const CreateAndUpdateForm = ({
       ...fieldData,
       image: image?.file,
     };
-
-    console.log(fieldData, "fieldData");
-
+    console.log(image?.file);
     if (productDialog?.lastClick === "NEW") {
       addProduct(sentData).then((d) => {
         if (!d.error) {

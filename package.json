@@ -50,6 +50,7 @@
     ]
   },
   "devDependencies": {
+    "msw": "^1.2.2",
     "sass": "^1.62.0"
   }
 }

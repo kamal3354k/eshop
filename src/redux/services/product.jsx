@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { APP_CONFIG } from "../../app.config";
 import { FormDataGeneratorFun } from "../../utlis";
+import { axiosInstance } from "../../utlis/axiosInstance";
 
 export const productAPI = createApi({
   reducerPath: "productApi",
@@ -30,8 +31,8 @@ export const productAPI = createApi({
         if (product) {
           const formData = FormDataGeneratorFun(product);
 
-          const response = await axios
-            .post(`${APP_CONFIG.APP_URL}/product/create`, formData, {
+          const response = await axiosInstance
+            .post("/product/create", formData, {
               headers: {
                 "Content-Type": "multipart/form-data",
               },
@@ -50,8 +51,8 @@ export const productAPI = createApi({
       async queryFn(changeObj) {
         if (changeObj) {
           const formData = FormDataGeneratorFun(changeObj);
-          const response = await axios
-            .put(`${APP_CONFIG.APP_URL}/product/${changeObj?.id}`, formData, {
+          const response = await axiosInstance
+            .put(`/product/${changeObj?.id}`, formData, {
               headers: {
                 "Content-Type": "multipart/form-data",
               },

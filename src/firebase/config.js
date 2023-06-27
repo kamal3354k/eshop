@@ -1,8 +1,16 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import {GoogleAuthProvider, createUserWithEmailAndPassword, getAuth, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut} from "firebase/auth"
-import {getFirestore} from "firebase/firestore"
-import {getStorage} from "firebase/storage"
+import {
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  getAuth,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
 export const firebaseConfig = {
@@ -11,14 +19,14 @@ export const firebaseConfig = {
   projectId: "eshop-1e6eb",
   storageBucket: "eshop-1e6eb.appspot.com",
   messagingSenderId: "693594435150",
-  appId: "1:693594435150:web:f9823bdec167b1c7061d1f"
+  appId: "1:693594435150:web:f9823bdec167b1c7061d1f",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const storage = getStorage(app)
+export const storage = getStorage(app);
 
 // email and password signup
 export function SignUpFunction(email, password) {
@@ -31,19 +39,23 @@ export function LoginFunction(email, password) {
 }
 
 // logout
-export async function LogoutFunction(){
-  await signOut(auth)
+export function LogoutFunction() {
+  return signOut(auth)
+    .then(() => true)
+    .catch(() => false);
 }
 
 // login with google
-export function LoginWithGoogleFunction(){
-  const googleAuthProvider = new GoogleAuthProvider()
-    return signInWithPopup(auth,googleAuthProvider)
+export function LoginWithGoogleFunction() {
+  const googleAuthProvider = new GoogleAuthProvider();
+  return signInWithPopup(auth, googleAuthProvider);
 }
 
 // reset password email
-export function ResetPasswordFuncition(email){
-  return sendPasswordResetEmail(auth,email)
+export function ResetPasswordFuncition(email) {
+  return sendPasswordResetEmail(auth, email)
+    .then(() => true)
+    .catch(() => false);
 }
 
 export default app;

@@ -131,7 +131,6 @@ export const searchAndFilter = async (req, res, next) => {
       : {
           ...defaultQuery,
           $and: Object.entries(filterableFields).map(([k, v]) => {
-            console.log(filterableFields, "filter");
             if (k === "min_price") {
               return { price: { $gte: v } };
             } else if (k === "max_price") {

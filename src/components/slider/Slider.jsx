@@ -17,7 +17,6 @@ const Slider = () => {
     );
   };
 
-  console.log(currentSlide);
   return (
     <>
       <div className="slider">

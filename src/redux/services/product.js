@@ -1,5 +1,4 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { APP_CONFIG } from "../../app.config";
 import { FormDataGeneratorFun } from "../../utlis";

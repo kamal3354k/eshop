@@ -45,7 +45,6 @@ const CreateAndUpdateForm = ({
       ...fieldData,
       image: image?.file,
     };
-    console.log(image?.file);
     if (productDialog?.lastClick === "NEW") {
       addProduct(sentData).then((d) => {
         if (!d.error) {
@@ -71,6 +70,7 @@ const CreateAndUpdateForm = ({
     }
   };
 
+  console.log(errors,"errors")
   useEffect(() => {
     if (product?._id && productDialog?.lastClick === "EDIT") {
       setImage({ previewImage: product?.image });
@@ -86,7 +86,7 @@ const CreateAndUpdateForm = ({
       visible={productDialog?.value}
       breakpoints={{ "960px": "75vw", "641px": "90vw" }}
       header={`${
-        productDialog?.lastClick === "Edit" ? "Edit" : "Add"
+        productDialog?.lastClick === "NEW" ? "Add" : "Edit"
       } Product Details`}
       modal
       className="p-fluid dialog"
@@ -100,7 +100,7 @@ const CreateAndUpdateForm = ({
               backgroundImage: `url(${image?.previewImage})`,
             }}
           >
-            <div class="edit-container">
+            {/* <div class="edit-container">
               <input
                 type="file"
                 id="imageUpload"
@@ -113,7 +113,7 @@ const CreateAndUpdateForm = ({
               <label for="imageUpload">
                 <BiCloudUpload />
               </label>
-            </div>
+            </div> */}
             {!image?.previewImage && (
               <div className="no-image">
                 <BiCameraOff />
@@ -144,6 +144,7 @@ const CreateAndUpdateForm = ({
             render={({ field }) => (
               <InputText
                 {...field}
+                id="name"
                 placeholder="Enter Product Name..."
                 className={errors?.name && "p-invalid"}
               />
@@ -203,6 +204,7 @@ const CreateAndUpdateForm = ({
                     <RadioButton
                       inputId={`category${idx}`}
                       name="category"
+                      id="category"
                       value={item}
                       onChange={(e) => field.onChange(e.value)}
                       checked={field?.value?.toLowerCase() === item}
@@ -227,7 +229,7 @@ const CreateAndUpdateForm = ({
             <Controller
               name="price"
               control={control}
-              defaultValue={0}
+              defaultValue={100}
               rules={{
                 required: "Price is required",
                 min: {
@@ -267,7 +269,7 @@ const CreateAndUpdateForm = ({
             <Controller
               name="quantity"
               control={control}
-              defaultValue={0}
+              defaultValue={1}
               rules={{
                 required: "Quantity is required",
                 min: {

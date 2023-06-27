@@ -25,7 +25,7 @@ import { Sidebar } from "primereact/sidebar";
 import { Slider } from "primereact/slider";
 import { MultiSelect } from "primereact/multiselect";
 import Loader from "../loader/Loader";
-import { formatCurrency } from "../../utlis";
+import { formatCurrency, getSeverity } from "../../utlis";
 
 export default function GridDataTable() {
 
@@ -178,21 +178,7 @@ export default function GridDataTable() {
     );
   };
 
-  const getSeverity = (product) => {
-    switch (product.inventoryStatus) {
-      case "INSTOCK":
-        return "success";
-
-      case "LOWSTOCK":
-        return "warning";
-
-      case "OUTOFSTOCK":
-        return "danger";
-
-      default:
-        return null;
-    }
-  };
+  
 
   //limit = row
   const onPage = ({ rows, first }) => {
@@ -306,6 +292,7 @@ export default function GridDataTable() {
             </Button>
           </div>
         </Sidebar>
+        
       </div>
       <div className="gridDatatable">
         <div className="card">
